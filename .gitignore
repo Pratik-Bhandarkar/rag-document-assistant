@@ -13,3 +13,6 @@ __pycache__/
 
 # VS Code settings
 .vscode/
+
+# Chunked text output - contains personal data
+chunks/
