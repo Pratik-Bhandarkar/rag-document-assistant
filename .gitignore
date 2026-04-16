@@ -1,0 +1,15 @@
+# Virtual environment
+venv/
+
+# Personal documents - never upload these
+documents/
+
+# Extracted text output - contains personal data
+output/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# VS Code settings
+.vscode/
