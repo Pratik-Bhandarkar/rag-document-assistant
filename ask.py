@@ -57,16 +57,24 @@ def generate_answer(query, results):
     """Sends the question and relevant chunks to Llama 3.2 and returns an answer."""
     chunks_text = "\n\n".join(results["documents"][0])
     
-    prompt = f"""You are a helpful assistant that answers questions about payslips and salary documents.
-Use only the information provided in the context below to answer the question.
-If the answer is not in the context, say "I could not find that information in the documents."
+    prompt = f"""You are a helpful multilingual assistant that answers questions about payslips and salary documents.
+                You can understand questions in both English and German, and should answer in the same language the question was asked in.
 
-Context:
-{chunks_text}
+                Important rules:
+                - Use ONLY the information provided in the context below to answer the question
+                - If the question is in English, answer in English
+                - If the question is in German, answer in German
+                - Be precise with numbers and currency amounts
+                - If you see repeated information in the context, use it only once
+                - If the answer is not clearly present in the context, say "I could not find that information in the documents"
+                - Never make up or estimate numbers that are not explicitly in the context
 
-Question: {query}
+                Context:
+                {chunks_text}
 
-Answer:"""
+                Question: {query}
+
+                Answer:"""
 
     response = ollama.chat(
         model=LLM_MODEL,
