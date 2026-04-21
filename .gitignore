@@ -16,3 +16,6 @@ __pycache__/
 
 # Chunked text output - contains personal data
 chunks/
+
+# Embeddings - contains personal data
+embeddings/
