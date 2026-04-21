@@ -26,9 +26,12 @@ def store_chunks(chunks, filename):
         embeddings.append(chunk["embedding"])
         documents.append(chunk["content"])
         metadatas.append({
-            "source_file": chunk["source_file"],
-            "chunk_number": chunk["chunk_number"]
-        })
+                    "source_file": chunk["source_file"],
+                    "chunk_number": chunk["chunk_number"],
+                    "employer": chunk["employer"],
+                    "month": chunk["month"],
+                    "year": chunk["year"]
+                })
 
     collection.add(
         ids=ids,
