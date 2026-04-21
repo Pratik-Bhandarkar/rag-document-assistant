@@ -19,3 +19,6 @@ chunks/
 
 # Embeddings - contains personal data
 embeddings/
+
+# ChromaDB database files
+chromadb/
