@@ -22,3 +22,6 @@ embeddings/
 
 # ChromaDB database files
 chromadb/
+
+# Environment variables - contains secret API keys
+.env

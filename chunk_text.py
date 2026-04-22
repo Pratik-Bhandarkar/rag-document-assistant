@@ -4,8 +4,8 @@ import json
 OUTPUT_FOLDER = Path(r"D:\Personal\Projects\rag-document-assistant\output")
 CHUNKS_FOLDER = Path(r"D:\Personal\Projects\rag-document-assistant\chunks")
 
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 50
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 100
 
 def parse_filename(filename):
     """Extracts employer, month and year from a payslip filename."""

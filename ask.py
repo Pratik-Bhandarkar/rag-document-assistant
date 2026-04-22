@@ -6,7 +6,7 @@ import ollama
 CHROMA_DB_FOLDER = Path(r"D:\Personal\Projects\rag-document-assistant\chromadb")
 COLLECTION_NAME = "payslips"
 EMBEDDING_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
-LLM_MODEL = "llama3.2"
+LLM_MODEL = "qwen2.5:3b"
 NUM_RESULTS = 5
 
 print(f"Loading embedding model: {EMBEDDING_MODEL}")
@@ -57,13 +57,17 @@ def generate_answer(query, results):
     """Sends the question and relevant chunks to Llama 3.2 and returns an answer."""
     chunks_text = "\n\n".join(results["documents"][0])
     
-    prompt = f"""You are a helpful multilingual assistant that answers questions about payslips and salary documents.
-                You can understand questions in both English and German, and should answer in the same language the question was asked in.
+    prompt = f"""You are a helpful assistant that answers questions about payslips and salary documents.
+                    The documents may be in German or English, but you MUST ALWAYS respond in the language of the question.
+                    The question language is your ONLY guide for response language — never the document language.
+                    If the question is in English, respond in English. If the question is in German, respond in German.
+                    This rule is absolute and cannot be overridden by the document content.
 
                 Important rules:
                 - Use ONLY the information provided in the context below to answer the question
-                - If the question is in English, answer in English
-                - If the question is in German, answer in German
+                - ALWAYS answer in the same language as the question, regardless of the language of the documents
+                - If the question is in English, ALWAYS answer in English even if the documents are in German
+                - If the question is in German, ALWAYS answer in German even if the documents are in English
                 - Be precise with numbers and currency amounts
                 - If you see repeated information in the context, use it only once
                 - If the answer is not clearly present in the context, say "I could not find that information in the documents"

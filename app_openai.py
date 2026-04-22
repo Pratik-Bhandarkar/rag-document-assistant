@@ -2,10 +2,14 @@ import streamlit as st
 from sentence_transformers import SentenceTransformer
 from pathlib import Path
 import chromadb
-import ollama
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 st.set_page_config(
-    page_title="Payslip Assistant",
+    page_title="Payslip Assistant (OpenAI)",
     page_icon="📄",
     layout="centered"
 )
@@ -13,21 +17,22 @@ st.set_page_config(
 CHROMA_DB_FOLDER = Path(r"D:\Personal\Projects\rag-document-assistant\chromadb")
 COLLECTION_NAME = "payslips"
 EMBEDDING_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
-LLM_MODEL = "llama3.2"
+LLM_MODEL = "gpt-4o-mini"
 NUM_RESULTS_FILTERED = 5
 NUM_RESULTS_UNFILTERED = 10
 
 @st.cache_resource
 def load_models():
-    """Loads the embedding model and ChromaDB collection once and caches them."""
+    """Loads the embedding model, ChromaDB collection and OpenAI client once and caches them."""
     embedding_model = SentenceTransformer(EMBEDDING_MODEL)
     client = chromadb.PersistentClient(path=str(CHROMA_DB_FOLDER))
     collection = client.get_or_create_collection(name=COLLECTION_NAME)
-    return embedding_model, collection
+    openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    return embedding_model, collection, openai_client
 
-embedding_model, collection = load_models()
+embedding_model, collection, openai_client = load_models()
 
-st.title("📄 Payslip Assistant")
+st.title("📄 Payslip Assistant (OpenAI)")
 st.markdown("Ask questions about your payslips in English or German.")
 st.divider()
 
@@ -59,7 +64,7 @@ def search(query, employer=None, month=None, year=None):
     
     any_filter = any([employer, month, year])
     num_results = NUM_RESULTS_FILTERED if any_filter else NUM_RESULTS_UNFILTERED
-    
+
     conditions = []
     if employer:
         conditions.append({"employer": {"$eq": employer}})
@@ -90,34 +95,37 @@ def search(query, employer=None, month=None, year=None):
     return results
 
 def generate_answer(query, results):
-    """Sends the question and relevant chunks to Llama 3.2 and returns an answer."""
+    """Sends the question and relevant chunks to GPT-4o-mini and returns an answer."""
     chunks_text = "\n\n".join(results["documents"][0])
     
-    prompt = f"""You are a helpful multilingual assistant that answers questions about payslips and salary documents.
-You can understand questions in both English and German, and should answer in the same language the question was asked in.
+    response = openai_client.chat.completions.create(
+        model=LLM_MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": """You are a helpful assistant that answers questions about payslips and salary documents.
+
+CRITICAL LANGUAGE RULE: You MUST detect the language of the Question field and respond in that EXACT language.
+- If the Question is in English → your ENTIRE response must be in English
+- If the Question is in German → your ENTIRE response must be in German
+- The language of the Context documents is IRRELEVANT to your response language
+- This rule overrides everything else
 
 Important rules:
-- Use ONLY the information provided in the context below to answer the question
-- If the question is in German, answer in German
-- If the question is in English, answer in English
+- Use ONLY the information provided in the context to answer the question
 - Be precise with numbers and currency amounts
 - If you see repeated information in the context, use it only once
 - If the answer is not clearly present in the context, say "I could not find that information in the documents"
-- Never make up or estimate numbers that are not explicitly in the context
-
-Context:
-{chunks_text}
-
-Question: {query}
-
-Answer:"""
-
-    response = ollama.chat(
-        model=LLM_MODEL,
-        messages=[{"role": "user", "content": prompt}]
+- Never make up or estimate numbers that are not explicitly in the context"""
+            },
+            {
+                "role": "user",
+                "content": f"Context (may be in any language - ignore its language):\n{chunks_text}\n\nQuestion to answer (detect THIS language for your response): {query}"
+            }
+        ]
     )
     
-    return response["message"]["content"]
+    return response.choices[0].message.content
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
