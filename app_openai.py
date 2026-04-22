@@ -111,6 +111,14 @@ CRITICAL LANGUAGE RULE: You MUST detect the language of the Question field and r
 - The language of the Context documents is IRRELEVANT to your response language
 - This rule overrides everything else
 
+ABBREVIATIONS = {
+    "HI": "Health Insurance (Krankenversicherung)",
+    "PI": "Pension Insurance (Rentenversicherung)",
+    "UI": "Unemployment Insurance (Arbeitslosenversicherung)",
+    "CI": "Care Insurance (Pflegeversicherung)",
+    "SI": "Social Insurance (Sozialversicherung)",
+}
+
 Important rules:
 - Use ONLY the information provided in the context to answer the question
 - Be precise with numbers and currency amounts
