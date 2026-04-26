@@ -22,23 +22,25 @@ This system allows natural language querying of personal payslip documents, retu
 
 ## 🏗️ Architecture
 
+```
 PDF Documents
-↓
+     ↓
 Text Extraction (PyMuPDF)
-↓
+     ↓
 Abbreviation Expansion (German payroll terms)
-↓
+     ↓
 Chunking with Overlap (1000 chars, 100 overlap)
-↓
+     ↓
 Multilingual Embeddings (sentence-transformers)
-↓
+     ↓
 Vector Storage with Metadata (ChromaDB)
-↓
+     ↓
 Semantic Search + Metadata Filtering
-↓
+     ↓
 LLM Answer Generation (Local or API)
-↓
+     ↓
 Streamlit Web UI with Citations
+```
 
 ---
 
@@ -60,6 +62,7 @@ Streamlit Web UI with Citations
 
 ## 📁 Project Structure
 
+```
 rag-document-assistant/
 │
 ├── extract_text.py           # PDF text extraction pipeline
@@ -71,6 +74,7 @@ rag-document-assistant/
 ├── app.py                    # Streamlit UI (local LLM via Ollama)
 ├── app_openai.py             # Streamlit UI (OpenAI API)
 └── README.md
+```
 
 ---
 
@@ -96,16 +100,20 @@ pip install pymupdf sentence-transformers chromadb ollama streamlit openai pytho
 ### 4. Add your documents
 Create the following folder structure and name your payslip files using this convention:
 
+```
 documents/
 └── payslips/
-└── Employer_Month_Year.pdf
+    └── Employer_Month_Year.pdf
+```
 
 Example:
+```
 documents/
 └── payslips/
-├── Employer1_Feb_2023.pdf
-├── Employer2_Jan_2024.pdf
-└── Employer3_Sep_2025.pdf
+    ├── Employer1_Feb_2023.pdf
+    ├── Employer2_Jan_2024.pdf
+    └── Employer3_Sep_2025.pdf
+```
 
 ### 5. Run the pipeline
 ```bash
